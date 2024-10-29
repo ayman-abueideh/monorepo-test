@@ -1,5 +1,3 @@
-# .copybara.conf
-
 # Define the origin repository (your monorepo)
 origin = git.origin(
     url = "https://github.com/ayman-abueideh/monorepo-test.git",
@@ -16,6 +14,7 @@ core.workflow(
     ),
     origin_files = glob(["internal_repo_1/**"]),
     destination_files = glob(["**"]),
+    authoring = authoring.pass_thru("Default User <default@example.com>"),
 )
 
 # Workflow to share only `internal_repo_2`
@@ -28,6 +27,7 @@ core.workflow(
     ),
     origin_files = glob(["internal_repo_2/**"]),
     destination_files = glob(["**"]),
+    authoring = authoring.pass_thru("Default User <default@example.com>"),
 )
 
 # Workflow to share all folders (`internal_repo_1`, `internal_repo_2`, and `internal_repo_3`)
@@ -40,4 +40,5 @@ core.workflow(
     ),
     origin_files = glob(["internal_repo_1/**", "internal_repo_2/**", "internal_repo_3/**"]),
     destination_files = glob(["**"]),
+    authoring = authoring.pass_thru("Default User <default@example.com>"),
 )
