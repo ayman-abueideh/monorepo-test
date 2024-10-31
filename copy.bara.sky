@@ -4,6 +4,11 @@ origin = git.origin(
     ref = "main"
 )
 
+external_repo_origin = git.origin(
+    url = "https://github.com/ayman-abueideh/external-repo-internal-repo-1.git",
+    ref = "main"
+)
+
 # Workflow to share only `internal_repo_1`
 core.workflow(
     name = "share_internal_repo_1",
@@ -14,7 +19,22 @@ core.workflow(
     ),
     origin_files = glob(["internal_repo_1/**"]),
     destination_files = glob(["**"]),
-    authoring = authoring.pass_thru("Default User <default@example.com>"),
+    authoring = authoring.pass_thru("ayman-abueideh <ayman-abu-eideh@hotmail.com>"),
+)
+
+
+# Workflow to import changes from `external-repo-internal-repo-1` back to `internal_repo_1`
+core.workflow(
+    name = "import_internal_repo_1",
+    origin = external_repo_origin,
+    destination = git.destination(
+        url = "https://github.com/ayman-abueideh/monorepo-test.git",
+        push = "refs/heads/main"
+    ),
+    # Place changes into the `internal_repo_1` directory in the monorepo
+    origin_files = glob(["**"]),
+    destination_files = glob(["internal_repo_1/**"]),
+    authoring = authoring.pass_thru("ayman-abueideh <ayman-abu-eideh@hotmail.com>"),
 )
 
 # Workflow to share only `internal_repo_2`
