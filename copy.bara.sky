@@ -5,7 +5,7 @@ origin = git.origin(
 )
 
 external_repo_origin = git.origin(
-    url = "https://github.com/ayman-abueideh/external-repo-internal-repo-1.git",
+    url = "https://github.com/ayman-abueideh/internal_repo_1.git",
     ref = "main"
 )
 
@@ -14,7 +14,7 @@ core.workflow(
     name = "share_internal_repo_1",
     origin = origin,
     destination = git.destination(
-        url = "https://github.com/ayman-abueideh/external-repo-internal-repo-1.git",
+        url = "https://github.com/ayman-abueideh/internal_repo_1.git",
         push = "refs/heads/main"
     ),
     origin_files = glob(["internal_repo_1/**"]),
@@ -22,22 +22,33 @@ core.workflow(
     authoring = authoring.pass_thru("ayman-abueideh <ayman-abu-eideh@hotmail.com>"),
 
     transformations = [
-        # Move and rename all files starting with 'project_' to 'file_'
+        # Transformation to rename files starting with 'project_' to 'file_'
+        #core.transform(
+        #    transformations = [
+        #        core.replace(
+        #            before = "internal_repo_1/project_*",
+        #            after = "internal_repo_1/new_*",
+        #            paths = glob(["internal_repo_1/project_*.py"])
+        #        ),
+        #    ],
+            #noop_behavior = "IGNORE_NOOP"
+        #),
         core.move(
-            before = "internal_repo_1/project_*.py",
-            after = "internal_repo_1/file_*.py"
+             before = "internal_repo_1/project_file.py",
+             after = "internal_repo_1/new_file.py",
         ),
+        core.move("internal_repo_1/internal_test_for_root/", ""),
 
         # Variable renaming and value transformation
         core.replace(
             before = "google_secret_value",
             after = "secret_value",
-            paths = glob(["internal_repo_1/project_*.py"])
+            paths = glob(["internal_repo_1/*.py"])
         ),
         core.replace(
             before = "127.0.0.1:9090",
             after = "localhost",
-            paths = glob(["internal_repo_1/project_*.py"])
+            paths = glob(["internal_repo_1/*.py"])
         ),
     ]
 )
@@ -55,22 +66,28 @@ core.workflow(
     authoring = authoring.pass_thru("ayman-abueideh <ayman-abu-eideh@hotmail.com>"),
 
     transformations = [
-        # Reverse move and rename for files starting with 'file_' back to 'project_'
-        core.move(
-            before = "internal_repo_1/file_*.py",
-            after = "internal_repo_1/project_*.py"
+        # Reverse transformation to rename files starting with 'file_' back to 'project_'
+        core.transform(
+            transformations = [
+                core.replace(
+                    before = "internal_repo_1/new_",
+                    after = "internal_repo_1/project_",
+                    paths = glob(["internal_repo_1/new_*.py"])
+                ),
+            ],
+            noop_behavior = "IGNORE_NOOP"
         ),
 
         # Reverse variable renaming and value transformation
         core.replace(
             before = "secret_value",
             after = "google_secret_value",
-            paths = glob(["internal_repo_1/file_*.py"])
+            paths = glob(["internal_repo_1/new_*.py"])
         ),
         core.replace(
             before = "localhost",
             after = "127.0.0.1:9090",
-            paths = glob(["internal_repo_1/file_*.py"])
+            paths = glob(["internal_repo_1/new_*.py"])
         ),
     ]
 )
