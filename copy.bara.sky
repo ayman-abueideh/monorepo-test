@@ -20,8 +20,27 @@ core.workflow(
     origin_files = glob(["internal_repo_1/**"]),
     destination_files = glob(["**"]),
     authoring = authoring.pass_thru("ayman-abueideh <ayman-abu-eideh@hotmail.com>"),
-)
 
+    transformations = [
+        # Move and rename all files starting with 'project_' to 'file_'
+        core.move(
+            before = "internal_repo_1/project_*.py",
+            after = "internal_repo_1/file_*.py"
+        ),
+
+        # Variable renaming and value transformation
+        core.replace(
+            before = "google_secret_value",
+            after = "secret_value",
+            paths = glob(["internal_repo_1/project_*.py"])
+        ),
+        core.replace(
+            before = "127.0.0.1:9090",
+            after = "localhost",
+            paths = glob(["internal_repo_1/project_*.py"])
+        ),
+    ]
+)
 
 # Workflow to import changes from `external-repo-internal-repo-1` back to `internal_repo_1`
 core.workflow(
@@ -31,11 +50,31 @@ core.workflow(
         url = "https://github.com/ayman-abueideh/monorepo-test.git",
         push = "refs/heads/main"
     ),
-    # Place changes into the `internal_repo_1` directory in the monorepo
     origin_files = glob(["**"]),
     destination_files = glob(["internal_repo_1/**"]),
     authoring = authoring.pass_thru("ayman-abueideh <ayman-abu-eideh@hotmail.com>"),
+
+    transformations = [
+        # Reverse move and rename for files starting with 'file_' back to 'project_'
+        core.move(
+            before = "internal_repo_1/file_*.py",
+            after = "internal_repo_1/project_*.py"
+        ),
+
+        # Reverse variable renaming and value transformation
+        core.replace(
+            before = "secret_value",
+            after = "google_secret_value",
+            paths = glob(["internal_repo_1/file_*.py"])
+        ),
+        core.replace(
+            before = "localhost",
+            after = "127.0.0.1:9090",
+            paths = glob(["internal_repo_1/file_*.py"])
+        ),
+    ]
 )
+
 
 # Workflow to share only `internal_repo_2`
 core.workflow(
