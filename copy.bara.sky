@@ -28,7 +28,7 @@ core.workflow(
              after = "internal_repo_1/new_file.py",
         ),
         # move files to another directory
-        core.move("internal_repo_1/internal_test_for_root/", ""),
+        core.move("internal_repo_1/internal_test_for_root/", "internal_test_for_root"),
 
         # Variable renaming and value transformation
         core.replace(
@@ -73,6 +73,6 @@ core.workflow(
             after = "internal_repo_1/project_file.py",
         ),
         # move files from directory to another
-        core.move("","internal_repo_1/internal_test_for_root/"),
+        core.move("internal_test_for_root","internal_repo_1/internal_test_for_root/"),
     ]
 )
