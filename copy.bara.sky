@@ -22,21 +22,12 @@ core.workflow(
     authoring = authoring.pass_thru("ayman-abueideh <ayman-abu-eideh@hotmail.com>"),
 
     transformations = [
-        # Transformation to rename files starting with 'project_' to 'file_'
-        #core.transform(
-        #    transformations = [
-        #        core.replace(
-        #            before = "internal_repo_1/project_*",
-        #            after = "internal_repo_1/new_*",
-        #            paths = glob(["internal_repo_1/project_*.py"])
-        #        ),
-        #    ],
-            #noop_behavior = "IGNORE_NOOP"
-        #),
+        # Rename File
         core.move(
              before = "internal_repo_1/project_file.py",
              after = "internal_repo_1/new_file.py",
         ),
+        # move files to another directory
         core.move("internal_repo_1/internal_test_for_root/", ""),
 
         # Variable renaming and value transformation
@@ -66,55 +57,22 @@ core.workflow(
     authoring = authoring.pass_thru("ayman-abueideh <ayman-abu-eideh@hotmail.com>"),
 
     transformations = [
-        # Reverse transformation to rename files starting with 'file_' back to 'project_'
-        core.transform(
-            transformations = [
-                core.replace(
-                    before = "internal_repo_1/new_",
-                    after = "internal_repo_1/project_",
-                    paths = glob(["internal_repo_1/new_*.py"])
-                ),
-            ],
-            noop_behavior = "IGNORE_NOOP"
-        ),
-
         # Reverse variable renaming and value transformation
         core.replace(
             before = "secret_value",
             after = "google_secret_value",
-            paths = glob(["internal_repo_1/new_*.py"])
+            paths = glob(["internal_repo_1/*.py"])
         ),
         core.replace(
             before = "localhost",
             after = "127.0.0.1:9090",
-            paths = glob(["internal_repo_1/new_*.py"])
+            paths = glob(["internal_repo_1/*.py"])
         ),
+        core.move(
+            before = "internal_repo_1/new_file.py",
+            after = "internal_repo_1/project_file.py",
+        ),
+        # move files from directory to another
+        core.move("","internal_repo_1/internal_test_for_root/"),
     ]
-)
-
-
-# Workflow to share only `internal_repo_2`
-core.workflow(
-    name = "share_internal_repo_2",
-    origin = origin,
-    destination = git.destination(
-        url = "https://github.com/ayman-abueideh/external-repo-internal-repo-2.git",
-        push = "refs/heads/main"
-    ),
-    origin_files = glob(["internal_repo_2/**"]),
-    destination_files = glob(["**"]),
-    authoring = authoring.pass_thru("Default User <default@example.com>"),
-)
-
-# Workflow to share all folders (`internal_repo_1`, `internal_repo_2`, and `internal_repo_3`)
-core.workflow(
-    name = "share_all_repos",
-    origin = origin,
-    destination = git.destination(
-        url = "https://github.com/ayman-abueideh/external-repo-all-internal-repos.git",
-        push = "refs/heads/main"
-    ),
-    origin_files = glob(["internal_repo_1/**", "internal_repo_2/**", "internal_repo_3/**"]),
-    destination_files = glob(["**"]),
-    authoring = authoring.pass_thru("Default User <default@example.com>"),
 )
