@@ -1,1 +1,2 @@
 "test"
+google_secret_value="127.0.0.1:9090"
