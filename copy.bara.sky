@@ -23,10 +23,16 @@ core.workflow(
 
     transformations = [
         # Rename File
+        #core.move(
+        #     before = "internal_repo_1/project_file.py",
+        #     after = "internal_repo_1/new_file.py",
+        #),
         core.move(
-             before = "internal_repo_1/project_file.py",
-             after = "internal_repo_1/new_file.py",
+            before='internal_repo_1/project_file${x}.py',
+            after='internal_repo_1/new_file${x}.py',
+            regex_groups={'x': '([0-9]*)'}
         ),
+
         # move files to another directory
         core.move("internal_repo_1/internal_test_for_root/", "internal_test_for_root"),
 
@@ -51,6 +57,42 @@ core.workflow(
     destination = git.destination(
         url = "https://github.com/ayman-abueideh/monorepo-test.git",
         push = "refs/heads/main"
+    ),
+    origin_files = glob(["**"]),
+    destination_files = glob(["internal_repo_1/**"]),
+    authoring = authoring.pass_thru("ayman-abueideh <ayman-abu-eideh@hotmail.com>"),
+
+    transformations = [
+        # Reverse variable renaming and value transformation
+        core.replace(
+            before = "secret_value",
+            after = "google_secret_value",
+            paths = glob(["internal_repo_1/*.py"])
+        ),
+        core.replace(
+            before = "localhost",
+            after = "127.0.0.1:9090",
+            paths = glob(["internal_repo_1/*.py"])
+        ),
+        core.move(
+            before = "internal_repo_1/new_file.py",
+            after = "internal_repo_1/project_file.py",
+        ),
+        # move files from directory to another
+        core.move("internal_test_for_root","internal_repo_1/internal_test_for_root/"),
+    ]
+)
+
+core.workflow(
+    name = "import_internal_repo_pr",
+    origin = external_repo_origin,
+    destination = git.github_pr_destination(
+        url = "https://github.com/ayman-abueideh/monorepo-test.git",
+        destination_ref = "refs/heads/main",
+        pr_branch = "from_public_repo1",
+        title = "pr from external public repo",
+        body = "this is a sample pull request",
+        integrates = [],
     ),
     origin_files = glob(["**"]),
     destination_files = glob(["internal_repo_1/**"]),
